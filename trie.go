@@ -109,7 +109,7 @@ func (t *Trie) Remove(key string) {
 
 // Returns all the keys currently stored in the trie.
 func (t *Trie) Keys() []string {
-	return t.PrefixSearch("")
+	return t.PrefixSearch("", 10)
 }
 
 // Performs a fuzzy search against the keys in the trie.
@@ -120,13 +120,13 @@ func (t Trie) FuzzySearch(pre string) []string {
 }
 
 // Performs a prefix search against the keys in the trie.
-func (t Trie) PrefixSearch(pre string) []string {
+func (t Trie) PrefixSearch(pre string, maxWords int) []string {
 	node := findNode(t.Root(), []rune(pre))
 	if node == nil {
 		return nil
 	}
 
-	return collect(node)
+	return collect(node, maxWords)
 }
 
 // Creates and returns a pointer to a new child for the node.
@@ -221,13 +221,14 @@ func maskruneslice(rs []rune) uint64 {
 	return m
 }
 
-func collect(node *Node) []string {
+func collect(node *Node, int MaxWords) []string {
 	var (
 		keys []string
 		n    *Node
 		i    int
 	)
 	nodes := []*Node{node}
+	count := 0
 	for l := len(nodes); l != 0; l = len(nodes) {
 		i = l - 1
 		n = nodes[i]
@@ -241,6 +242,10 @@ func collect(node *Node) []string {
 				word = string(p.val) + word
 			}
 			keys = append(keys, word)
+			count++
+			if count > MaxWords {
+				return keys
+			}
 		}
 	}
 	return keys
@@ -272,7 +277,7 @@ func fuzzycollect(node *Node, partial []rune) []string {
 		if p.node.val == partial[p.idx] {
 			p.idx++
 			if p.idx == len(partial) {
-				keys = append(keys, collect(p.node)...)
+				keys = append(keys, collect(p.node, 10)...)
 				continue
 			}
 		}
