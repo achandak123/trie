@@ -241,11 +241,11 @@ func collect(node *Node, MaxWords int) []string {
 			for p := n.parent; p.depth != 0; p = p.parent {
 				word = string(p.val) + word
 			}
-			keys = append(keys, word)
-			count++
 			if count > MaxWords {
 				return keys
 			}
+			keys = append(keys, word)
+			count++
 		}
 	}
 	return keys
