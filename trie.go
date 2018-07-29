@@ -221,7 +221,7 @@ func maskruneslice(rs []rune) uint64 {
 	return m
 }
 
-func collect(node *Node, int MaxWords) []string {
+func collect(node *Node, MaxWords int) []string {
 	var (
 		keys []string
 		n    *Node
